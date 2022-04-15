@@ -61,6 +61,7 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
         LoginData(
           name: auth.email,
           password: auth.password,
+          verificationCode: auth.verificationCode
         ));
 
     if (error != null) {

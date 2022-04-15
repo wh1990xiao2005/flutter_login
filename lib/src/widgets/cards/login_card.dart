@@ -6,6 +6,7 @@ class _LoginCard extends StatefulWidget {
     required this.loadingController,
     required this.userValidator,
     required this.passwordValidator,
+    required this.verificationCodeValidator,
     required this.onSwitchRecoveryPassword,
     required this.onSwitchSignUpAdditionalData,
     required this.userType,
@@ -18,11 +19,13 @@ class _LoginCard extends StatefulWidget {
     this.hideSignUpButton = false,
     this.loginAfterSignUp = true,
     this.hideProvidersTitle = false,
+    this.showVerificationCodeField = false,
   }) : super(key: key);
 
   final AnimationController loadingController;
   final FormFieldValidator<String>? userValidator;
   final FormFieldValidator<String>? passwordValidator;
+  final FormFieldValidator<String>? verificationCodeValidator;
   final Function onSwitchRecoveryPassword;
   final Function onSwitchSignUpAdditionalData;
   final Function onSwitchConfirmSignup;
@@ -35,6 +38,7 @@ class _LoginCard extends StatefulWidget {
   final LoginUserType userType;
   final bool requireAdditionalSignUpFields;
   final bool requireSignUpConfirmation;
+  final bool showVerificationCodeField;
 
   @override
   _LoginCardState createState() => _LoginCardState();
@@ -49,6 +53,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   late TextEditingController _nameController;
   late TextEditingController _passController;
   late TextEditingController _confirmPassController;
+  late TextEditingController _verificationCodeController;
 
   var _isLoading = false;
   var _isSubmitting = false;
@@ -64,6 +69,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
 
   Interval? _nameTextFieldLoadingAnimationInterval;
   Interval? _passTextFieldLoadingAnimationInterval;
+  Interval? _verificationCodeFieldLoadingAnimationInterval;
   Interval? _textButtonLoadingAnimationInterval;
   late Animation<double> _buttonScaleAnimation;
 
@@ -77,6 +83,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     _nameController = TextEditingController(text: auth.email);
     _passController = TextEditingController(text: auth.password);
     _confirmPassController = TextEditingController(text: auth.confirmPassword);
+    _verificationCodeController = TextEditingController(text: auth.verificationCode);
 
     widget.loadingController.addStatusListener(handleLoadingAnimationStatus);
 
@@ -103,6 +110,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
 
     _nameTextFieldLoadingAnimationInterval = const Interval(0, .85);
     _passTextFieldLoadingAnimationInterval = const Interval(.15, 1.0);
+    _verificationCodeFieldLoadingAnimationInterval = const Interval(.3, 1.0);
     _textButtonLoadingAnimationInterval =
         const Interval(.6, 1.0, curve: Curves.easeOut);
     _buttonScaleAnimation =
@@ -172,6 +180,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       error = await auth.onLogin?.call(LoginData(
         name: auth.email,
         password: auth.password,
+        verificationCode: auth.verificationCode,
       ));
     } else {
       if (!widget.requireAdditionalSignUpFields) {
@@ -309,6 +318,30 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
         FocusScope.of(context).requestFocus(_passwordFocusNode);
       },
       validator: widget.userValidator,
+      onSaved: (value) => auth.email = value!,
+      enabled: !_isSubmitting,
+    );
+  }
+
+  Widget _buildVerificationCodeField(
+      double width,
+      LoginMessages messages,
+      Auth auth,
+      ) {
+    return AnimatedTextFormField(
+      controller: _verificationCodeController,
+      width: width,
+      loadingController: widget.loadingController,
+      interval: _verificationCodeFieldLoadingAnimationInterval,
+      labelText:
+      messages.verificationCodeHint,
+      prefixIcon: const Icon(FontAwesomeIcons.key),
+      keyboardType: TextFieldUtils.getKeyboardType(widget.userType),
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (value) {
+        FocusScope.of(context).requestFocus(_passwordFocusNode);
+      },
+      validator: widget.verificationCodeValidator,
       onSaved: (value) => auth.email = value!,
       enabled: !_isSubmitting,
     );
@@ -603,6 +636,8 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
                 _buildUserField(textFieldWidth, messages, auth),
                 const SizedBox(height: 20),
                 _buildPasswordField(textFieldWidth, messages, auth),
+                if (widget.showVerificationCodeField) const SizedBox(height: 20),
+                if (widget.showVerificationCodeField) _buildVerificationCodeField(textFieldWidth, messages, auth),
                 const SizedBox(height: 10),
               ],
             ),
