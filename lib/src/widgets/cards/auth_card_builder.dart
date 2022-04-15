@@ -40,12 +40,14 @@ class AuthCard extends StatefulWidget {
       required this.loadingController,
       this.userValidator,
       this.passwordValidator,
+      this.verificationCodeValidator,
       this.onSubmit,
       this.onSubmitCompleted,
       this.hideForgotPasswordButton = false,
       this.hideSignUpButton = false,
       this.loginAfterSignUp = true,
       this.hideProvidersTitle = false,
+      this.showVerificationCodeField = false,
       this.additionalSignUpFields,
       this.disableCustomPageTransformer = false,
       this.loginTheme,
@@ -57,6 +59,7 @@ class AuthCard extends StatefulWidget {
   final AnimationController loadingController;
   final FormFieldValidator<String>? userValidator;
   final FormFieldValidator<String>? passwordValidator;
+  final FormFieldValidator<String>? verificationCodeValidator;
   final Function? onSubmit;
   final Function? onSubmitCompleted;
   final bool hideForgotPasswordButton;
@@ -64,6 +67,7 @@ class AuthCard extends StatefulWidget {
   final bool loginAfterSignUp;
   final LoginUserType userType;
   final bool hideProvidersTitle;
+  final bool showVerificationCodeField;
 
   final List<UserFormField>? additionalSignUpFields;
 
@@ -341,6 +345,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             hideForgotPasswordButton: widget.hideForgotPasswordButton,
             loginAfterSignUp: widget.loginAfterSignUp,
             hideProvidersTitle: widget.hideProvidersTitle,
+            showVerificationCodeField: widget.showVerificationCodeField,
+            verificationCodeValidator: widget.verificationCodeValidator,
           ),
         );
       case _recoveryIndex:

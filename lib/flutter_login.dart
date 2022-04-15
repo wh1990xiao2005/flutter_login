@@ -283,6 +283,7 @@ class FlutterLogin extends StatefulWidget {
       this.theme,
       this.userValidator,
       this.passwordValidator,
+      this.verificationCodeValidator,
       this.onSubmitAnimationCompleted,
       this.logoTag,
       this.userType = LoginUserType.email,
@@ -293,6 +294,7 @@ class FlutterLogin extends StatefulWidget {
       this.loginAfterSignUp = true,
       this.footer,
       this.hideProvidersTitle = false,
+      this.showVerificationCodeField = false,
       this.additionalSignupFields,
       this.disableCustomPageTransformer = false,
       this.navigateBackAfterRecovery = false,
@@ -350,6 +352,12 @@ class FlutterLogin extends StatefulWidget {
 
   /// Same as [userValidator] but for password
   final FormFieldValidator<String>? passwordValidator;
+
+  /// Email validating logic, Returns an error string to display if the input is
+  /// invalid, or null otherwise
+  final FormFieldValidator<String>? verificationCodeValidator;
+
+  final bool showVerificationCodeField;
 
   /// Called after the submit animation's completed. Put your route transition
   /// logic here. Recommend to use with [logoTag] and [titleTag]
@@ -437,6 +445,13 @@ class FlutterLogin extends StatefulWidget {
   static String? defaultPasswordValidator(value) {
     if (value!.isEmpty || value.length <= 2) {
       return 'Password is too short!';
+    }
+    return null;
+  }
+
+  static String? defaultVerificationCodeValidator(value) {
+    if (value!.isEmpty) {
+      return 'Invalid Verification Code!';
     }
     return null;
   }
@@ -733,6 +748,7 @@ class _FlutterLoginState extends State<FlutterLogin>
         widget.userValidator ?? FlutterLogin.defaultEmailValidator;
     final passwordValidator =
         widget.passwordValidator ?? FlutterLogin.defaultPasswordValidator;
+    final verificationCodeValidator = widget.verificationCodeValidator ?? FlutterLogin.defaultVerificationCodeValidator;
 
     Widget footerWidget = const SizedBox();
     if (widget.footer != null) {
@@ -762,6 +778,7 @@ class _FlutterLoginState extends State<FlutterLogin>
             loginProviders: widget.loginProviders,
             email: widget.savedEmail,
             password: widget.savedPassword,
+            verificationCode: "",
             confirmPassword: widget.savedPassword,
             onConfirmRecover: widget.onConfirmRecover,
             onConfirmSignup: widget.onConfirmSignup,
@@ -797,6 +814,7 @@ class _FlutterLoginState extends State<FlutterLogin>
                         loadingController: _loadingController,
                         userValidator: userValidator,
                         passwordValidator: passwordValidator,
+                        verificationCodeValidator: verificationCodeValidator,
                         onSubmit: _reverseHeaderAnimation,
                         onSubmitCompleted: widget.onSubmitAnimationCompleted,
                         hideSignUpButton: widget.onSignup == null,
@@ -804,6 +822,7 @@ class _FlutterLoginState extends State<FlutterLogin>
                             widget.hideForgotPasswordButton,
                         loginAfterSignUp: widget.loginAfterSignUp,
                         hideProvidersTitle: widget.hideProvidersTitle,
+                        showVerificationCodeField: widget.showVerificationCodeField,
                         additionalSignUpFields: widget.additionalSignupFields,
                         disableCustomPageTransformer:
                             widget.disableCustomPageTransformer,

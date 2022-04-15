@@ -49,11 +49,13 @@ class Auth with ChangeNotifier {
       String email = '',
       String password = '',
       String confirmPassword = '',
+      String verificationCode = '',
       AuthMode initialAuthMode = AuthMode.login,
       this.termsOfService = const []})
       : _email = email,
         _password = password,
         _confirmPassword = confirmPassword,
+        _verificationCode = verificationCode,
         _mode = initialAuthMode;
 
   final LoginCallback? onLogin;
@@ -116,6 +118,13 @@ class Auth with ChangeNotifier {
   String get confirmPassword => _confirmPassword;
   set confirmPassword(String confirmPassword) {
     _confirmPassword = confirmPassword;
+    notifyListeners();
+  }
+
+  String _verificationCode = '';
+  String get verificationCode => _verificationCode;
+  set verificationCode(String verificationCode) {
+    _verificationCode = verificationCode;
     notifyListeners();
   }
 
