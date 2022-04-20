@@ -9,12 +9,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  font_awesome_flutter: ^9.1.0
+  font_awesome_flutter: ^10.1.0
+
   provider: ^6.0.1
   another_transformer_page_view: ^1.1.0
   another_flushbar: ^1.10.28
-  flutter_signin_button: ^2.0.0
-
+  flutter_signin_button:
+    git: https://github.com/klniu/Flutter-Sign-in-Button.git
   # flutter_test from sdk depends on quiver
   quiver: ^3.0.1
   url_launcher: ^6.0.12

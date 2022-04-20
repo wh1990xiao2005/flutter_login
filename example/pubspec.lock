@@ -93,9 +93,11 @@ packages:
   flutter_signin_button:
     dependency: transitive
     description:
-      name: flutter_signin_button
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "09ea744e650abb71b48b0861a13a38dbe081fe02"
+      url: "https://github.com/klniu/Flutter-Sign-in-Button.git"
+    source: git
     version: "2.0.0"
   flutter_test:
     dependency: "direct dev"
@@ -113,7 +115,7 @@ packages:
       name: font_awesome_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "9.1.0"
+    version: "10.1.0"
   intl:
     dependency: "direct main"
     description:
