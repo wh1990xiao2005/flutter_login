@@ -237,6 +237,7 @@ class LoginScreen extends StatelessWidget {
         debugPrint('Login info');
         debugPrint('Name: ${loginData.name}');
         debugPrint('Password: ${loginData.password}');
+        debugPrint('Password: ${loginData.verificationCode}');
         return _loginUser(loginData);
       },
       onSignup: (signupData) {
