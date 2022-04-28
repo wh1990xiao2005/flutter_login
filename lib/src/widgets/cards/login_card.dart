@@ -336,13 +336,12 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       labelText:
       messages.verificationCodeHint,
       prefixIcon: const Icon(FontAwesomeIcons.key),
-      keyboardType: TextFieldUtils.getKeyboardType(widget.userType),
+      keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: (value) {
-        FocusScope.of(context).requestFocus(_passwordFocusNode);
       },
       validator: widget.verificationCodeValidator,
-      onSaved: (value) => auth.email = value!,
+      onSaved: (value) => auth.verificationCode = value!,
       enabled: !_isSubmitting,
     );
   }

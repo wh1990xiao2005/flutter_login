@@ -101,7 +101,7 @@ class LoginScreen extends StatelessWidget {
       ],
       additionalSignupFields: [
         const UserFormField(
-            keyName: 'Username', icon: Icon(FontAwesomeIcons.userAlt)),
+            keyName: 'Username', icon: Icon(FontAwesomeIcons.userLarge)),
         const UserFormField(keyName: 'Name'),
         const UserFormField(keyName: 'Surname'),
         UserFormField(
@@ -237,6 +237,7 @@ class LoginScreen extends StatelessWidget {
         debugPrint('Login info');
         debugPrint('Name: ${loginData.name}');
         debugPrint('Password: ${loginData.password}');
+        debugPrint('Password: ${loginData.verificationCode}');
         return _loginUser(loginData);
       },
       onSignup: (signupData) {
