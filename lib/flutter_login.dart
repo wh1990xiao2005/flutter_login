@@ -7,34 +7,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
+import 'package:flutter_login/src/color_helper.dart';
+import 'package:flutter_login/src/constants.dart';
+import 'package:flutter_login/src/dart_helper.dart';
 import 'package:flutter_login/src/models/login_user_type.dart';
 import 'package:flutter_login/src/models/term_of_service.dart';
 import 'package:flutter_login/src/models/user_form_field.dart';
+import 'package:flutter_login/src/providers/auth.dart';
+import 'package:flutter_login/src/providers/login_messages.dart';
+import 'package:flutter_login/src/providers/login_theme.dart';
+import 'package:flutter_login/src/regex.dart';
+import 'package:flutter_login/src/widgets/cards/auth_card_builder.dart';
+import 'package:flutter_login/src/widgets/fade_in.dart';
+import 'package:flutter_login/src/widgets/gradient_box.dart';
+import 'package:flutter_login/src/widgets/hero_text.dart';
+import 'package:flutter_login/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
-import 'src/color_helper.dart';
-import 'src/constants.dart';
-import 'src/dart_helper.dart';
-import 'src/providers/auth.dart';
-import 'src/providers/login_messages.dart';
-import 'src/providers/login_theme.dart';
-import 'src/regex.dart';
-import 'src/widgets/cards/auth_card_builder.dart';
-import 'src/widgets/fade_in.dart';
-import 'src/widgets/gradient_box.dart';
-import 'src/widgets/hero_text.dart';
-import 'theme.dart';
+export 'package:sign_in_button/src/button_list.dart';
 
 export 'src/models/login_data.dart';
 export 'src/models/login_user_type.dart';
 export 'src/models/signup_data.dart';
+export 'src/models/term_of_service.dart';
 export 'src/models/user_form_field.dart';
+export 'src/providers/auth.dart';
 export 'src/providers/login_messages.dart';
 export 'src/providers/login_theme.dart';
-export 'src/models/term_of_service.dart';
-export 'src/providers/auth.dart';
-export 'package:sign_in_button/src/button_list.dart';
 
 class LoginProvider {
   /// Used for custom sign-in buttons.
@@ -69,14 +69,14 @@ class LoginProvider {
   /// Default: true
   final bool animated;
 
-  const LoginProvider(
-      {this.button,
-      this.icon,
-      required this.callback,
-      this.label = '',
-      this.providerNeedsSignUpCallback,
-      this.animated = true})
-      : assert(button != null || icon != null);
+  const LoginProvider({
+    this.button,
+    this.icon,
+    required this.callback,
+    this.label = '',
+    this.providerNeedsSignUpCallback,
+    this.animated = true,
+  }) : assert(button != null || icon != null);
 }
 
 class _AnimationTimeDilationDropdown extends StatelessWidget {
@@ -94,7 +94,6 @@ class _AnimationTimeDilationDropdown extends StatelessWidget {
     return SizedBox(
       height: 200,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(10.0),
@@ -196,10 +195,9 @@ class __HeaderState extends State<_Header> {
     final theme = Theme.of(context);
     const gap = 5.0;
     final logoHeight = min(
-        (widget.height - MediaQuery.of(context).padding.top) -
-            _titleHeight -
-            gap,
-        kMaxLogoHeight);
+      (widget.height - MediaQuery.of(context).padding.top) - _titleHeight - gap,
+      kMaxLogoHeight,
+    );
     final displayLogo = widget.logo != null && logoHeight >= kMinLogoHeight;
     final cardWidth = min(MediaQuery.of(context).size.width * 0.75, 360.0);
 
@@ -242,7 +240,7 @@ class __HeaderState extends State<_Header> {
 
     return SafeArea(
       child: SizedBox(
-        height: (widget.height - MediaQuery.of(context).padding.top),
+        height: widget.height - MediaQuery.of(context).padding.top,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
@@ -268,46 +266,48 @@ class __HeaderState extends State<_Header> {
 }
 
 class FlutterLogin extends StatefulWidget {
-  FlutterLogin(
-      {Key? key,
-      this.onSignup,
-      required this.onLogin,
-      required this.onRecoverPassword,
-      this.title,
+  FlutterLogin({
+    super.key,
+    this.onSignup,
+    required this.onLogin,
+    required this.onRecoverPassword,
+    this.title,
 
-      /// The [ImageProvider] or asset path [String] for the logo image to be displayed
-      dynamic logo,
-      this.messages,
-      this.theme,
-      this.userValidator,
-      this.passwordValidator,
-      this.verificationCodeValidator,
-      this.onSubmitAnimationCompleted,
-      this.logoTag,
-      this.userType = LoginUserType.email,
-      this.titleTag,
-      this.showDebugButtons = false,
-      this.loginProviders = const <LoginProvider>[],
-      this.hideForgotPasswordButton = false,
-      this.loginAfterSignUp = true,
-      this.footer,
-      this.hideProvidersTitle = false,
-      this.showVerificationCodeField = false,
-      this.additionalSignupFields,
-      this.disableCustomPageTransformer = false,
-      this.navigateBackAfterRecovery = false,
-      this.termsOfService = const <TermOfService>[],
-      this.onConfirmRecover,
-      this.onConfirmSignup,
-      this.onResendCode,
-      this.savedEmail = '',
-      this.savedPassword = '',
-      this.initialAuthMode = AuthMode.login,
-      this.children,
-      this.scrollable = false})
-      : assert((logo is String?) || (logo is ImageProvider?)),
-        logo = logo is String ? AssetImage(logo) : logo,
-        super(key: key);
+    /// The [ImageProvider] or asset path [String] for the logo image to be displayed
+    dynamic logo,
+    this.messages,
+    this.theme,
+    this.userValidator,
+    this.passwordValidator,
+    this.onSubmitAnimationCompleted,
+    this.logoTag,
+    this.userType = LoginUserType.email,
+    this.titleTag,
+    this.showDebugButtons = false,
+    this.loginProviders = const <LoginProvider>[],
+    this.hideForgotPasswordButton = false,
+    this.loginAfterSignUp = true,
+    this.footer,
+    this.hideProvidersTitle = false,
+    this.additionalSignupFields,
+    this.disableCustomPageTransformer = false,
+    this.navigateBackAfterRecovery = false,
+    this.termsOfService = const <TermOfService>[],
+    this.onConfirmRecover,
+    this.onConfirmSignup,
+    this.onResendCode,
+    this.savedEmail = '',
+    this.savedPassword = '',
+    this.initialAuthMode = AuthMode.login,
+    this.children,
+    this.scrollable = false,
+    this.confirmSignupKeyboardType,
+    this.headerWidget,
+    this.onSwitchToAdditionalFields,
+    this.verificationCodeValidator,
+    this.showVerificationCodeField = false,
+  })  : assert((logo is String?) || (logo is ImageProvider?)),
+        logo = logo is String ? AssetImage(logo) : logo as ImageProvider?;
 
   /// Called when the user hit the submit button when in sign up mode
   ///
@@ -359,7 +359,7 @@ class FlutterLogin extends StatefulWidget {
 
   /// Called after the submit animation's completed. Put your route transition
   /// logic here. Recommend to use with [logoTag] and [titleTag]
-  final Function? onSubmitAnimationCompleted;
+  final VoidCallback? onSubmitAnimationCompleted;
 
   /// Hero tag for logo image. If not specified, it will simply fade out when
   /// changing route
@@ -378,6 +378,11 @@ class FlutterLogin extends StatefulWidget {
   /// This List contains the additional signup fields.
   /// By setting this, after signup another card with a form for additional user data is shown
   final List<UserFormField>? additionalSignupFields;
+
+  /// Called when the user hit the submit button when in sign up mode, before
+  /// additionalSignupFields are shown
+  /// Optional
+  final BeforeAdditionalFieldsCallback? onSwitchToAdditionalFields;
 
   /// Set to true to hide the Forgot Password button
   final bool hideForgotPasswordButton;
@@ -406,6 +411,11 @@ class FlutterLogin extends StatefulWidget {
   /// Optional
   final ConfirmSignupCallback? onConfirmSignup;
 
+  /// Sets [TextInputType] of sign up confirmation form.
+  ///
+  /// Defaults to [TextInputType.text].
+  final TextInputType? confirmSignupKeyboardType;
+
   /// Called when the user hits the resend code button in confirm signup mode
   /// Only when onConfirmSignup is set
   final SignupCallback? onResendCode;
@@ -433,15 +443,18 @@ class FlutterLogin extends StatefulWidget {
   /// Default: false
   final bool scrollable;
 
-  static String? defaultEmailValidator(value) {
-    if (value!.isEmpty || !Regex.email.hasMatch(value)) {
+  /// A widget that can be placed on top of the loginCard.
+  final Widget? headerWidget;
+
+  static String? defaultEmailValidator(String? value) {
+    if (value == null || value.isEmpty || !Regex.email.hasMatch(value)) {
       return 'Invalid email!';
     }
     return null;
   }
 
-  static String? defaultPasswordValidator(value) {
-    if (value!.isEmpty || value.length <= 2) {
+  static String? defaultPasswordValidator(String? value) {
+    if (value == null || value.isEmpty || value.length <= 2) {
       return 'Password is too short!';
     }
     return null;
@@ -594,8 +607,10 @@ class _FlutterLoginState extends State<FlutterLogin>
     );
   }
 
-  ThemeData _mergeTheme(
-      {required ThemeData theme, required LoginTheme loginTheme}) {
+  ThemeData _mergeTheme({
+    required ThemeData theme,
+    required LoginTheme loginTheme,
+  }) {
     final blackOrWhite =
         theme.brightness == Brightness.light ? Colors.black54 : Colors.white;
     final primaryOrWhite = theme.brightness == Brightness.light
@@ -780,6 +795,7 @@ class _FlutterLoginState extends State<FlutterLogin>
             confirmPassword: widget.savedPassword,
             onConfirmRecover: widget.onConfirmRecover,
             onConfirmSignup: widget.onConfirmSignup,
+            beforeAdditionalFieldsCallback: widget.onSwitchToAdditionalFields,
             onResendCode: widget.onResendCode,
             termsOfService: widget.termsOfService,
             initialAuthMode: widget.initialAuthMode,
@@ -795,8 +811,6 @@ class _FlutterLoginState extends State<FlutterLogin>
                 loginTheme.pageColorLight ?? theme.primaryColor,
                 loginTheme.pageColorDark ?? theme.primaryColorDark,
               ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
             ),
             SingleChildScrollView(
               child: Theme(
@@ -828,6 +842,9 @@ class _FlutterLoginState extends State<FlutterLogin>
                         navigateBackAfterRecovery:
                             widget.navigateBackAfterRecovery,
                         scrollable: widget.scrollable,
+                        confirmSignupKeyboardType:
+                            widget.confirmSignupKeyboardType,
+                        introWidget: widget.headerWidget,
                       ),
                     ),
                     Positioned(
@@ -835,9 +852,11 @@ class _FlutterLoginState extends State<FlutterLogin>
                       child: _buildHeader(headerHeight, loginTheme),
                     ),
                     Positioned.fill(
-                        child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: footerWidget)),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: footerWidget,
+                      ),
+                    ),
                     ...?widget.children,
                   ],
                 ),

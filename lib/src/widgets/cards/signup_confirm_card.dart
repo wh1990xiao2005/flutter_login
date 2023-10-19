@@ -2,17 +2,19 @@ part of auth_card_builder;
 
 class _ConfirmSignupCard extends StatefulWidget {
   const _ConfirmSignupCard({
-    Key? key,
+    super.key,
     required this.onBack,
     required this.onSubmitCompleted,
     this.loginAfterSignUp = true,
     required this.loadingController,
-  }) : super(key: key);
+    required this.keyboardType,
+  });
 
   final bool loginAfterSignUp;
   final VoidCallback onBack;
   final VoidCallback onSubmitCompleted;
   final AnimationController loadingController;
+  final TextInputType? keyboardType;
 
   @override
   _ConfirmSignupCardState createState() => _ConfirmSignupCardState();
@@ -45,7 +47,7 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
   }
 
   Future<bool> _submit() async {
-    FocusScope.of(context).requestFocus(FocusNode());
+    FocusScope.of(context).unfocus();
 
     if (!_formRecoverKey.currentState!.validate()) {
       return false;
@@ -57,12 +59,13 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
     await _fieldSubmitController.forward();
     setState(() => _isSubmitting = true);
     final error = await auth.onConfirmSignup!(
-        _code,
-        LoginData(
-          name: auth.email,
-          password: auth.password,
-          verificationCode: auth.verificationCode
-        ));
+      _code,
+      LoginData(
+        name: auth.email,
+        password: auth.password,
+        verificationCode: auth.verificationCode
+      ),
+    );
 
     if (error != null) {
       showErrorToast(context, messages.flushbarTitleError, error);
@@ -72,7 +75,10 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
     }
 
     showSuccessToast(
-        context, messages.flushbarTitleSuccess, messages.confirmSignupSuccess);
+      context,
+      messages.flushbarTitleSuccess,
+      messages.confirmSignupSuccess,
+    );
     setState(() => _isSubmitting = false);
     await _fieldSubmitController.reverse();
 
@@ -87,17 +93,20 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
   }
 
   Future<bool> _resendCode() async {
-    FocusScope.of(context).requestFocus(FocusNode());
+    FocusScope.of(context).unfocus();
 
     final auth = Provider.of<Auth>(context, listen: false);
     final messages = Provider.of<LoginMessages>(context, listen: false);
 
     await _fieldSubmitController.forward();
     setState(() => _isSubmitting = true);
-    final error = await auth.onResendCode!(SignupData.fromSignupForm(
+    final error = await auth.onResendCode!(
+      SignupData.fromSignupForm(
         name: auth.email,
         password: auth.password,
-        termsOfService: auth.getTermsOfServiceResults()));
+        termsOfService: auth.getTermsOfServiceResults(),
+      ),
+    );
 
     if (error != null) {
       showErrorToast(context, messages.flushbarTitleError, error);
@@ -107,7 +116,10 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
     }
 
     showSuccessToast(
-        context, messages.flushbarTitleSuccess, messages.resendCodeSuccess);
+      context,
+      messages.flushbarTitleSuccess,
+      messages.resendCodeSuccess,
+    );
     setState(() => _isSubmitting = false);
     await _fieldSubmitController.reverse();
     return true;
@@ -128,6 +140,7 @@ class _ConfirmSignupCardState extends State<_ConfirmSignupCard>
         return null;
       },
       onSaved: (value) => _code = value!,
+      keyboardType: widget.keyboardType,
     );
   }
 

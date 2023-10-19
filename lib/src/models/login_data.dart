@@ -9,7 +9,7 @@ class LoginData {
 
   @override
   String toString() {
-    return '$runtimeType($name, $password, $verificationCode)';
+    return 'LoginData($name, $password, $verificationCode)';
   }
 
   @override
@@ -21,5 +21,5 @@ class LoginData {
   }
 
   @override
-  int get hashCode => hash3(name, password, verificationCode);
+  int get hashCode => hash2(name, password, verificationCode);
 }
