@@ -57,6 +57,7 @@ class Auth with ChangeNotifier {
     String confirmPassword = '',
     AuthMode initialAuthMode = AuthMode.login,
     this.termsOfService = const [],
+    String verificationCode = '',
   })  : _email = email,
         _password = password,
         _confirmPassword = confirmPassword,
