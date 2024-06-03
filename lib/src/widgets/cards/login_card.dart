@@ -12,6 +12,7 @@ class _LoginCard extends StatefulWidget {
     required this.requireAdditionalSignUpFields,
     required this.onSwitchConfirmSignup,
     required this.requireSignUpConfirmation,
+    required this.onSavePasswordChanged,
     this.onSubmitCompleted,
     this.hideForgotPasswordButton = false,
     this.hideSignUpButton = false,
@@ -29,6 +30,7 @@ class _LoginCard extends StatefulWidget {
   final VoidCallback onSwitchSignUpAdditionalData;
   final VoidCallback onSwitchConfirmSignup;
   final VoidCallback? onSubmitCompleted;
+  final Function onSavePasswordChanged;
   final bool hideForgotPasswordButton;
   final bool hideSignUpButton;
   final bool loginAfterSignUp;
@@ -58,6 +60,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   var _isLoading = false;
   var _isSubmitting = false;
   var _showShadow = true;
+  var _isSavePassword = false;
 
   /// switch between login and signup
   late AnimationController _switchAuthController;
@@ -443,6 +446,18 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildSavePassword(LoginMessages messages) {
+  return Row(children: [
+    Checkbox(value: _isSavePassword, onChanged: (bool? isChecked) {
+      setState(() {
+        _isSavePassword = isChecked ?? false;
+        widget.onSavePasswordChanged(_isSavePassword);
+      });
+    }),
+    Expanded(child: Text(messages.savePasswordHint))]);
+  }
+
+
   Widget _buildSubmitButton(
     ThemeData theme,
     LoginMessages messages,
@@ -692,6 +707,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
                 if (widget.showVerificationCodeField) const SizedBox(height: 20),
                 if (widget.showVerificationCodeField) _buildVerificationCodeField(textFieldWidth, messages, auth),
                 const SizedBox(height: 10),
+                _buildSavePassword(messages)
               ],
             ),
           ),

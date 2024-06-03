@@ -306,6 +306,7 @@ class FlutterLogin extends StatefulWidget {
     this.onSwitchToAdditionalFields,
     this.verificationCodeValidator,
     this.showVerificationCodeField = false,
+    required this.onSavePasswordChanged,
   })  : assert((logo is String?) || (logo is ImageProvider?)),
         logo = logo is String ? AssetImage(logo) : logo as ImageProvider?;
 
@@ -360,6 +361,8 @@ class FlutterLogin extends StatefulWidget {
   /// Called after the submit animation's completed. Put your route transition
   /// logic here. Recommend to use with [logoTag] and [titleTag]
   final VoidCallback? onSubmitAnimationCompleted;
+
+  final Function onSavePasswordChanged;
 
   /// Hero tag for logo image. If not specified, it will simply fade out when
   /// changing route
@@ -829,6 +832,7 @@ class _FlutterLoginState extends State<FlutterLogin>
                         verificationCodeValidator: verificationCodeValidator,
                         onSubmit: _reverseHeaderAnimation,
                         onSubmitCompleted: widget.onSubmitAnimationCompleted,
+                        onSavePasswordChanged: widget.onSavePasswordChanged,
                         hideSignUpButton: widget.onSignup == null,
                         hideForgotPasswordButton:
                             widget.hideForgotPasswordButton,

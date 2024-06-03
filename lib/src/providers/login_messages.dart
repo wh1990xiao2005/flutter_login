@@ -37,6 +37,7 @@ class LoginMessages with ChangeNotifier {
     this.setPasswordButton = defaultSetPasswordButton,
     this.confirmRecoverSuccess = defaultConfirmRecoverSuccess,
     this.recoverCodePasswordDescription = defaultRecoverCodePasswordDescription,
+    this.savePasswordHint = defaultSavePasswordHint,
   });
 
   static const defaultPasswordHint = 'Password';
@@ -79,6 +80,7 @@ class LoginMessages with ChangeNotifier {
   static const defaultResendCodeSuccess = 'A new email has been sent.';
   static const defaultConfirmSignupButton = 'CONFIRM';
   static const defaultConfirmSignupSuccess = 'Account confirmed.';
+  static const defaultSavePasswordHint = 'Save user name and password.';
 
   /// Hint text of the userHint [TextField]
   /// Default will be selected based on userType
@@ -89,6 +91,9 @@ class LoginMessages with ChangeNotifier {
 
   /// Description in the additional signup form
   final String additionalSignUpFormDescription;
+
+  /// Text of the save password checkbox [CheckBox]
+  final String savePasswordHint;
 
   /// Hint text of the password [TextField]
   final String passwordHint;
