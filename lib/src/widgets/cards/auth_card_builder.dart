@@ -1,6 +1,5 @@
 library auth_card_builder;
 
-import 'dart:collection';
 import 'dart:math';
 
 import 'package:another_transformer_page_view/another_transformer_page_view.dart';
@@ -12,19 +11,17 @@ import 'package:flutter_login/src/matrix.dart';
 import 'package:flutter_login/src/paddings.dart';
 import 'package:flutter_login/src/utils/text_field_utils.dart';
 import 'package:flutter_login/src/widget_helper.dart';
+import 'package:flutter_login/src/widgets/animated_button.dart';
+import 'package:flutter_login/src/widgets/animated_icon.dart';
+import 'package:flutter_login/src/widgets/animated_text.dart';
+import 'package:flutter_login/src/widgets/animated_text_form_field.dart';
+import 'package:flutter_login/src/widgets/custom_page_transformer.dart';
+import 'package:flutter_login/src/widgets/expandable_container.dart';
+import 'package:flutter_login/src/widgets/fade_in.dart';
 import 'package:flutter_login/src/widgets/term_of_service_checkbox.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
-
-import '../../../flutter_login.dart';
-import '../animated_button.dart';
-import '../animated_icon.dart';
-import '../animated_text.dart';
-import '../animated_text_form_field.dart';
-import '../custom_page_transformer.dart';
-import '../expandable_container.dart';
-import '../fade_in.dart';
 
 part 'additional_signup_card.dart';
 part 'login_card.dart';
@@ -33,41 +30,45 @@ part 'recover_confirm_card.dart';
 part 'signup_confirm_card.dart';
 
 class AuthCard extends StatefulWidget {
-  const AuthCard(
-      {Key? key,
-      required this.userType,
-      this.padding = const EdgeInsets.all(0),
-      required this.loadingController,
-      this.userValidator,
-      this.passwordValidator,
-      this.verificationCodeValidator,
-      this.onSubmit,
-      this.onSubmitCompleted,
-      this.hideForgotPasswordButton = false,
-      this.hideSignUpButton = false,
-      this.loginAfterSignUp = true,
-      this.hideProvidersTitle = false,
-      this.showVerificationCodeField = false,
-      this.additionalSignUpFields,
-      this.disableCustomPageTransformer = false,
-      this.loginTheme,
-      this.navigateBackAfterRecovery = false,
-      required this.scrollable})
-      : super(key: key);
+  const AuthCard({
+    super.key,
+    required this.userType,
+    this.padding = EdgeInsets.zero,
+    required this.loadingController,
+    this.userValidator,
+    this.passwordValidator,
+    this.onSubmit,
+    this.onSubmitCompleted,
+    required this.onSavePasswordChanged,
+    this.hideForgotPasswordButton = false,
+    this.hideSignUpButton = false,
+    this.loginAfterSignUp = true,
+    this.hideProvidersTitle = false,
+    this.additionalSignUpFields,
+    this.disableCustomPageTransformer = false,
+    this.loginTheme,
+    this.navigateBackAfterRecovery = false,
+    required this.scrollable,
+    required this.confirmSignupKeyboardType,
+    this.introWidget,
+    this.verificationCodeValidator,
+    this.showVerificationCodeField = false,
+  });
 
   final EdgeInsets padding;
   final AnimationController loadingController;
   final FormFieldValidator<String>? userValidator;
   final FormFieldValidator<String>? passwordValidator;
-  final FormFieldValidator<String>? verificationCodeValidator;
-  final Function? onSubmit;
-  final Function? onSubmitCompleted;
+  final VoidCallback? onSubmit;
+  final VoidCallback? onSubmitCompleted;
+  final Function onSavePasswordChanged;
   final bool hideForgotPasswordButton;
   final bool hideSignUpButton;
   final bool loginAfterSignUp;
   final LoginUserType userType;
   final bool hideProvidersTitle;
   final bool showVerificationCodeField;
+  final FormFieldValidator<String>? verificationCodeValidator;
 
   final List<UserFormField>? additionalSignUpFields;
 
@@ -76,6 +77,8 @@ class AuthCard extends StatefulWidget {
   final bool navigateBackAfterRecovery;
 
   final bool scrollable;
+  final TextInputType? confirmSignupKeyboardType;
+  final Widget? introWidget;
 
   @override
   AuthCardState createState() => AuthCardState();
@@ -142,27 +145,35 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 1100),
     );
 
-    _cardSizeAnimation = Tween<double>(begin: 1.0, end: cardSizeScaleEnd)
-        .animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(0, .27272727 /* ~300ms */,
-          curve: Curves.easeInOutCirc),
-    ));
+    _cardSizeAnimation =
+        Tween<double>(begin: 1.0, end: cardSizeScaleEnd).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(
+          0,
+          .27272727 /* ~300ms */,
+          curve: Curves.easeInOutCirc,
+        ),
+      ),
+    );
 
     // replace 0 with minPositive to pass the test
     // https://github.com/flutter/flutter/issues/42527#issuecomment-575131275
     _cardOverlayHeightFactorAnimation =
-        Tween<double>(begin: double.minPositive, end: 1.0)
-            .animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(.27272727, .5 /* ~250ms */, curve: Curves.linear),
-    ));
+        Tween<double>(begin: double.minPositive, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(.27272727, .5),
+      ),
+    );
 
     _cardOverlaySizeAndOpacityAnimation =
-        Tween<double>(begin: 1.0, end: 0).animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(.5, .72727272 /* ~250ms */, curve: Curves.linear),
-    ));
+        Tween<double>(begin: 1.0, end: 0).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(.5, .72727272),
+      ),
+    );
 
     _cardSize2AnimationX =
         Tween<double>(begin: 1, end: 1).animate(_routeTransitionController);
@@ -170,12 +181,16 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
     _cardSize2AnimationY =
         Tween<double>(begin: 1, end: 1).animate(_routeTransitionController);
 
-    _cardRotationAnimation =
-        Tween<double>(begin: 0, end: pi / 2).animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(.72727272, 1 /* ~300ms */,
-          curve: Curves.easeInOutCubic),
-    ));
+    _cardRotationAnimation = Tween<double>(begin: 0, end: pi / 2).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(
+          .72727272,
+          1 /* ~300ms */,
+          curve: Curves.easeInOutCubic,
+        ),
+      ),
+    );
   }
 
   @override
@@ -223,17 +238,19 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
     final heightRatio = deviceSize.height / cardSize.width + .25;
 
     _cardSize2AnimationX =
-        Tween<double>(begin: 1.0, end: heightRatio / cardSizeScaleEnd)
-            .animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(.72727272, 1, curve: Curves.easeInOutCubic),
-    ));
+        Tween<double>(begin: 1.0, end: heightRatio / cardSizeScaleEnd).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(.72727272, 1, curve: Curves.easeInOutCubic),
+      ),
+    );
     _cardSize2AnimationY =
-        Tween<double>(begin: 1.0, end: widthRatio / cardSizeScaleEnd)
-            .animate(CurvedAnimation(
-      parent: _routeTransitionController,
-      curve: const Interval(.72727272, 1, curve: Curves.easeInOutCubic),
-    ));
+        Tween<double>(begin: 1.0, end: widthRatio / cardSizeScaleEnd).animate(
+      CurvedAnimation(
+        parent: _routeTransitionController,
+        curve: const Interval(.72727272, 1, curve: Curves.easeInOutCubic),
+      ),
+    );
 
     widget.onSubmit?.call();
 
@@ -317,7 +334,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
 
   Widget _changeToCard(BuildContext context, int index) {
     final auth = Provider.of<Auth>(context, listen: false);
-    var formController = _formLoadingController;
+    final formController = _formLoadingController;
     // if (!_isLoadingFirstTime) formController = _formLoadingController..value = 1.0;
     switch (index) {
       case _loginPageIndex:
@@ -339,31 +356,34 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                 widget.onSubmitCompleted!();
               });
             },
+            onSavePasswordChanged: widget.onSavePasswordChanged,
             requireSignUpConfirmation: auth.onConfirmSignup != null,
             onSwitchConfirmSignup: () => _changeCard(_confirmSignup),
             hideSignUpButton: widget.hideSignUpButton,
             hideForgotPasswordButton: widget.hideForgotPasswordButton,
             loginAfterSignUp: widget.loginAfterSignUp,
             hideProvidersTitle: widget.hideProvidersTitle,
+            introWidget: widget.introWidget,
             showVerificationCodeField: widget.showVerificationCodeField,
             verificationCodeValidator: widget.verificationCodeValidator,
           ),
         );
       case _recoveryIndex:
         return _RecoverCard(
-            userValidator: widget.userValidator,
-            userType: widget.userType,
-            loginTheme: widget.loginTheme,
-            loadingController: formController,
-            navigateBack: widget.navigateBackAfterRecovery,
-            onBack: () => _changeCard(_loginPageIndex),
-            onSubmitCompleted: () {
-              if (auth.onConfirmRecover != null) {
-                _changeCard(_confirmRecover);
-              } else {
-                _changeCard(_loginPageIndex);
-              }
-            });
+          userValidator: widget.userValidator,
+          userType: widget.userType,
+          loginTheme: widget.loginTheme,
+          loadingController: formController,
+          navigateBack: widget.navigateBackAfterRecovery,
+          onBack: () => _changeCard(_loginPageIndex),
+          onSubmitCompleted: () {
+            if (auth.onConfirmRecover != null) {
+              _changeCard(_confirmRecover);
+            } else {
+              _changeCard(_loginPageIndex);
+            }
+          },
+        );
 
       case _additionalSignUpIndex:
         if (widget.additionalSignUpFields == null) {
@@ -420,6 +440,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               }
             },
             loginAfterSignUp: widget.loginAfterSignUp,
+            keyboardType: widget.confirmSignupKeyboardType,
           ),
         );
     }
@@ -430,7 +451,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
 
-    Widget current = Container(
+    final Widget current = Container(
       height: deviceSize.height,
       width: deviceSize.width,
       padding: widget.padding,
@@ -450,8 +471,10 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             return Align(
               alignment: Alignment.topCenter,
               child: Scrollbar(
-                  child: SingleChildScrollView(
-                      child: _changeToCard(context, index))),
+                child: SingleChildScrollView(
+                  child: _changeToCard(context, index),
+                ),
+              ),
             );
           } else {
             return Align(
