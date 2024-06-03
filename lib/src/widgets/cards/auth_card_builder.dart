@@ -49,6 +49,7 @@ class AuthCard extends StatefulWidget {
     this.navigateBackAfterRecovery = false,
     required this.scrollable,
     required this.confirmSignupKeyboardType,
+    required this.onSavePasswordChanged,
     this.introWidget,
     this.verificationCodeValidator,
     this.showVerificationCodeField = false,
@@ -60,6 +61,7 @@ class AuthCard extends StatefulWidget {
   final FormFieldValidator<String>? passwordValidator;
   final VoidCallback? onSubmit;
   final VoidCallback? onSubmitCompleted;
+  final Function onSavePasswordChanged;
   final bool hideForgotPasswordButton;
   final bool hideSignUpButton;
   final bool loginAfterSignUp;
@@ -354,6 +356,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                 widget.onSubmitCompleted!();
               });
             },
+            onSavePasswordChanged: widget.onSavePasswordChanged,
             requireSignUpConfirmation: auth.onConfirmSignup != null,
             onSwitchConfirmSignup: () => _changeCard(_confirmSignup),
             hideSignUpButton: widget.hideSignUpButton,
