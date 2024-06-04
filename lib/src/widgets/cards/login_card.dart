@@ -447,16 +447,17 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   }
 
   Widget _buildSavePassword(LoginMessages messages) {
-  return Row(children: [
-    Checkbox(value: _isSavePassword, onChanged: (bool? isChecked) {
-      setState(() {
-        _isSavePassword = isChecked ?? false;
-        widget.onSavePasswordChanged(_isSavePassword);
-      });
-    }),
-    Expanded(child: Text(messages.savePasswordHint))]);
+    return Row(children: [
+      Checkbox(
+          activeColor: Theme.of(context).colorScheme.primary,
+          value: _isSavePassword, onChanged: (bool? isChecked) {
+            setState(() {
+              _isSavePassword = isChecked ?? false;
+              widget.onSavePasswordChanged(_isSavePassword);
+            });
+      }),
+      Expanded(child: Text(messages.savePasswordHint))]);
   }
-
 
   Widget _buildSubmitButton(
     ThemeData theme,
